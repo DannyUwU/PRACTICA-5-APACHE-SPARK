@@ -1,0 +1,14 @@
+val df =spark.read.option("header","true").csv("/_a/data.csv")
+df.select('event_type').distinct().show()
+df.select('product_id').distinct().count()
+
+
+df.select(['product_id']).filter("event_type='cart'").first()
+
+
+sesions=df.select(['user_session']).filter("event_type='cart' AND product_id=5844305").distinct()
+products=df.select(['product_id']).filter("event_type='cart' AND product_id<>5844305").filter( df["user_session"].isin(sesions["user_session"]) )
+
+
+df.createOrReplaceTempView("data")
+spark.sql("select * from data limit 5").show()
